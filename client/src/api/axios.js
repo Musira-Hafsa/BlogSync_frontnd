@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-baseURL: 'https://blogsync-backend.vercel.app'
- 
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://blog-sync-backend-two.vercel.app',
+  withCredentials: true
 });
 
 // Attach Bearer token from storage if present
