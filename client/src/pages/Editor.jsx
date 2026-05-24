@@ -239,7 +239,7 @@ function CoverUploader({ coverUrl, setCoverUrl, uploading, setUploading }) {
   const fileRef = useRef();
 
   // file upload
-  const handleFile = async (e) => {
+const handleFile = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUrlError("");
@@ -251,20 +251,14 @@ function CoverUploader({ coverUrl, setCoverUrl, uploading, setUploading }) {
       setCoverUrl(url);
       setCoverLocal("");
       URL.revokeObjectURL(local);
-    } catch {
-      setCoverUrl(local); // fallback blob
+    } catch (err) {
+      // 🟩 FIX: Don't set the database URL to a local blob. Alert the user instead!
+      console.error(err);
+      alert("Image upload failed. Please try again or use a direct URL.");
+      setCoverLocal(""); 
+      URL.revokeObjectURL(local);
     } finally { setUploading(false); }
   };
-
-  // url apply
-  const applyUrl = () => {
-    setUrlError("");
-    const trimmed = urlInput.trim();
-    if (!trimmed) { setUrlError("Please enter a URL."); return; }
-    try { new URL(trimmed); } catch { setUrlError("Enter a valid URL (include https://)."); return; }
-    setCoverUrl(trimmed);
-  };
-
   const displayCover = coverLocal || coverUrl;
 
   return (
