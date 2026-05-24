@@ -8,8 +8,12 @@
  import { useNavigate } from "react-router-dom";
  import ThemeToggle from "../components/ThemeToggle";
  
- const API = axios.create({ baseURL: "http://localhost:5000/api" });
- 
+ const API = axios.create({ 
+  // Looks for the Vercel variable first, falls back to local machine if not found
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
+  withCredentials: true 
+}); 
+
  const Styles = () => (
    <style>{`
      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
