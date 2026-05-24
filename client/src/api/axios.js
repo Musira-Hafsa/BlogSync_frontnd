@@ -1,7 +1,10 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://blog-sync-backend-two.vercel.app',
+  
+  baseURL: import.meta.env.VITE_API_BASE_URL 
+    ? `${import.meta.env.VITE_API_BASE_URL}/api` 
+    : 'https://blog-sync-backend-two.vercel.app/api',
   withCredentials: true
 });
 
