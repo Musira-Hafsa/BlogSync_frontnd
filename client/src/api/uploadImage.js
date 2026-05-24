@@ -1,4 +1,6 @@
-const BASE = "http://localhost:5000/api";
+const BASE = import.meta.env.VITE_API_BASE_URL 
+  ? `${import.meta.env.VITE_API_BASE_URL}/api` 
+  : "http://localhost:5000/api";
 
 /**
  * Upload a File object to Cloudinary via the backend.
