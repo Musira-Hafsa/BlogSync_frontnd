@@ -298,23 +298,37 @@ export default function BlogPost() {
     return () => { mounted = false; unsub(); };
   }, [post?.author?.handle]);
 
-  const handleLike=useCallback(async()=>{
-    if(!user){navigate("/auth");return;}
-    const next=!liked; setLiked(next); setLikeCount(n=>next?n+1:n-1);
-    try{await API.patch(`/blogs/${id}/like`);const token = localStorage.getItem("token"); 
+ const handleLike = useCallback(async () => {
+  if (!user) {
+    navigate("/auth");
+    return;
+  }
 
-    await axios.patch(
-      `http://localhost:5000/api/blogs/${blogId}/like`, 
-      {}, // Empty body because we only need the ID from the URL
+  const next = !liked; 
+  setLiked(next); 
+  setLikeCount(n => next ? n + 1 : n - 1);
+
+  try {
+    // 1. Fetch the token (using bs_token to match your authentication configuration)
+    const token = localStorage.getItem("bs_token") || localStorage.getItem("token"); 
+
+    // 2. Fire exactly ONE request using your live API instance with headers attached
+    await API.patch(
+      `/blogs/${id}/like`, 
+      {}, 
       {
         headers: {
-          Authorization: `Bearer ${token}` // 🔥 CRITICAL: Sends the token to the backend
+          Authorization: `Bearer ${token}`
         }
       }
-    );}
-
-    catch{setLiked(!next);setLikeCount(n=>next?n-1:n+1);}
-  },[liked,user,id,navigate]);
+    );
+  } catch (error) {
+    // Revert UI changes immediately if the server rejects the request
+    console.error("Liking failed:", error);
+    setLiked(!next);
+    setLikeCount(n => next ? n - 1 : n + 1);
+  }
+}, [liked, user, id, navigate]);
 
   const handleShare=()=>{ navigator.clipboard?.writeText(window.location.href).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2200);}); };
 
