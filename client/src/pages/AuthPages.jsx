@@ -9,10 +9,11 @@
  import ThemeToggle from "../components/ThemeToggle";
  
  const API = axios.create({ 
-  // Looks for the Vercel variable first, falls back to local machine if not found
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL 
+    ? `${import.meta.env.VITE_API_BASE_URL}/api` 
+    : "http://localhost:5000/api",
   withCredentials: true 
-}); 
+});
 
  const Styles = () => (
    <style>{`
