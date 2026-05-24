@@ -17,7 +17,7 @@ export async function uploadImage(file, type = "cover", onProgress) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     const fd  = new FormData();
-    fd.append("image", file);
+    fd.append(type, file);
 
     xhr.open("POST", `${BASE}/upload/${type}`);
     xhr.setRequestHeader("Authorization", `Bearer ${token}`);
