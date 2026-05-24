@@ -191,16 +191,17 @@
      } finally { setLoading(false); }
    };
  
-   const googleLogin = () => {
-  window.location.href =
-    "http://localhost:5000/api/auth/google";
+const googleLogin = () => {
+  // 🟩 Dynamically uses your live server url if VITE_API_BASE_URL is not set
+  const baseURL = import.meta.env.VITE_API_BASE_URL || "https://blog-sync-backend-two.vercel.app";
+  window.location.href = `${baseURL}/api/auth/google`;
 };
 
 const githubLogin = () => {
-  window.location.href =
-    "http://localhost:5000/api/auth/github";
+  // 🟩 Works perfectly both on localhost and on your live Vercel site
+  const baseURL = import.meta.env.VITE_API_BASE_URL || "https://blog-sync-backend-two.vercel.app";
+  window.location.href = `${baseURL}/api/auth/github`;
 };
-   
    return (
      <form onSubmit={handleSubmit} className="form-fade">
        {error && <div className="alert alert-error"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>{error}</div>}
