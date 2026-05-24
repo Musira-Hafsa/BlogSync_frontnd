@@ -5,7 +5,12 @@ import { follow as followUser, unfollow as unfollowUser, onFollowUpdate } from "
 import { uploadImage, cloudinaryUrl } from "../api/uploadImage";
 import ThemeToggle from "../components/ThemeToggle";
 
-const API = axios.create({ baseURL: "http://localhost:5000/api" });
+const API = axios.create({ 
+  baseURL: import.meta.env.VITE_API_BASE_URL 
+    ? `${import.meta.env.VITE_API_BASE_URL}/api` 
+    : "http://localhost:5000/api",
+  withCredentials: true 
+});
 API.interceptors.request.use((cfg) => {
   const t = localStorage.getItem("bs_token") || sessionStorage.getItem("bs_token");
   if (t) cfg.headers.Authorization = `Bearer ${t}`;
