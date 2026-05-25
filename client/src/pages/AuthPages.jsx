@@ -15,6 +15,23 @@
   withCredentials: true 
 });
 
+// 🚀 ADDED: Automatically inject "bs_token" into request headers before they go out
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("bs_token");
+    
+    if (token) {
+      // Formats the header as: Authorization: Bearer <your_jwt_token>
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
  const Styles = () => (
    <style>{`
      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
