@@ -518,20 +518,50 @@ export default function Home() {
     feedRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  useEffect(()=>{
-    (async()=>{
+    const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("bs_user") || sessionStorage.getItem("bs_user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+
+  // ==========================================
+  // FETCH BLOGS LOGIC (YOURS UPDATED WITH STATE CHECK)
+  // ==========================================
+  useEffect(() => {
+    (async () => {
       setLoading(true);
-      try{
-        const{data}=await API.get("/blogs");
-        setPosts(data.length?data:MOCK);
-      }catch{ setPosts(MOCK); }
+      
+      // Sync local user state if a token exists but user state is empty
+      const token = localStorage.getItem("bs_token") || sessionStorage.getItem("bs_token");
+      if (token && !user) {
+        try {
+          const { data } = await API.get("/auth/me"); // Adjust endpoint if your profile route is different
+          setUser(data);
+          localStorage.setItem("bs_user", JSON.stringify(data));
+        } catch (err) {
+          console.error("Could not fetch user profile on mount:", err);
+        }
+      }
+
+      try {
+        const { data } = await API.get("/blogs");
+        setPosts(data.length ? data : MOCK);
+      } catch { 
+        setPosts(MOCK); 
+      }
       setLoading(false);
     })();
-  },[]);
+  }, [user]);
 
-  const handleLogout=()=>{
-    ["bs_token","bs_user"].forEach(k=>{localStorage.removeItem(k);sessionStorage.removeItem(k);});
-    setUser(null); navigate("/auth");
+
+ const handleLogout = () => {
+    ["bs_token", "bs_user"].forEach(k => {
+      localStorage.removeItem(k);
+      sessionStorage.removeItem(k);
+    });
+    // Clear cookies if you used the cross-subdomain fallback setting
+    document.cookie = "token=; path=/; max-age=0;"; 
+    setUser(null); 
+    navigate("/auth");
   };
 
   const topicMatches = (post, topic) => {
