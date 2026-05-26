@@ -15,10 +15,6 @@ export default function AuthSuccess() {
       // 2. 🚀 FIX: Save it as a Cookie so your Axios 'withCredentials: true' can see it!
       document.cookie = `token=${token}; path=/; max-age=604800; SameSite=None; Secure`;
 
-      // 3. Optional: If you have a custom context login trigger, call it here
-      // Example: login(token);
-
-      // 4. Force push the router past the home page guard
       navigate("/"); 
     } else {
       navigate("/auth");

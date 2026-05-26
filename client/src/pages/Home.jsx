@@ -4,6 +4,7 @@ import axios from "../api/axios";
 import { follow as followUser, unfollow as unfollowUser } from "../utils/followService";
 import { cloudinaryUrl } from "../api/uploadImage";
 import ThemeToggle from "../components/ThemeToggle";
+import { jwtDecode } from "jwt-decode";
 
 const API = axios.create({ 
   baseURL: import.meta.env.VITE_API_BASE_URL 
@@ -526,32 +527,27 @@ export default function Home() {
   // ==========================================
   // FETCH BLOGS LOGIC (YOURS UPDATED WITH STATE CHECK)
   // ==========================================
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
+ useEffect(() => {
+  (async () => {
+    setLoading(true);
+    
+    // 1. Grab your authenticated token
+    const token = localStorage.getItem("bs_token") || sessionStorage.getItem("bs_token");
+    if (token && !user) {
+      const fallbackUser = { isAuthenticated: true, loggedInViaSocial: true };
       
-      // Sync local user state if a token exists but user state is empty
-      const token = localStorage.getItem("bs_token") || sessionStorage.getItem("bs_token");
-      if (token && !user) {
-        try {
-          const { data } = await API.get("/auth/me"); // Adjust endpoint if your profile route is different
-          setUser(data);
-          localStorage.setItem("bs_user", JSON.stringify(data));
-        } catch (err) {
-          console.error("Could not fetch user profile on mount:", err);
-        }
-      }
-
-      try {
-        const { data } = await API.get("/blogs");
-        setPosts(data.length ? data : MOCK);
-      } catch { 
-        setPosts(MOCK); 
-      }
-      setLoading(false);
-    })();
-  }, [user]);
-
+      setUser(fallbackUser);
+      localStorage.setItem("bs_user", JSON.stringify(fallbackUser));
+    }
+    try {
+      const { data } = await API.get("/blogs");
+      setPosts(data.length ? data : MOCK);
+    } catch { 
+      setPosts(MOCK); 
+    }
+    setLoading(false);
+  })();
+}, [user]);
 
  const handleLogout = () => {
     ["bs_token", "bs_user"].forEach(k => {
