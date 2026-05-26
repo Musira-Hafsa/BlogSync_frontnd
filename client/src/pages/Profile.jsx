@@ -436,26 +436,45 @@ export default function Profile() {
 useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // Fallback: If route parameter is missing or says "undefined", extract the saved handle text
-        let targetHandle = handle;
-        if (!targetHandle || targetHandle === "undefined") {
-          const savedUser = localStorage.getItem("bs_user");
-          if (savedUser) {
-            const parsed = JSON.parse(savedUser);
-            targetHandle = parsed.handle; // Target the text handle field
-          }
-        }
-
-        // 2. THIS IS WHERE YOU REPLACE THE API CALL STRING:
-        const { data } = await API.get(`/users/${targetHandle}`);
+        setLoading(true);
+        
+        // 1. Try to fetch from the backend database row
+        // 💡 TIP: If your backend is singular, change '/users/' to '/user/' here
+        const { data } = await API.get(`/users/${handle}`);
         setProfileData(data);
       } catch (err) {
-        console.error("Profile fetch failed:", err);
+        console.warn("Backend profile endpoint failed, falling back to session data.", err);
+        
+        // 2. 🚀 RESILIENT FALLBACK: If backend returns a 404, use the local session cache!
+        const savedUser = localStorage.getItem("bs_user");
+        if (savedUser) {
+          const parsed = JSON.parse(savedUser);
+          // If the profile ID matches who is logged in, use their data
+          if (parsed.handle === handle || parsed._id === handle) {
+            setProfileData({
+              name: parsed.firstName || "Google User",
+              username: "User",
+              email: parsed.email || "",
+              avatar: parsed.avatar || ""
+            });
+          }
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchProfile();
+    if (handle && handle !== "undefined") {
+      fetchProfile();
+    } else {
+      setLoading(false);
+    }
   }, [handle]);
+  
+  if (loading) return <div className="text-white text-center mt-20">Loading profile...</div>;
+  // 3. Render your data securely using your existing layout hooks
+  const displayName = profileData?.name || "BlogSync User";
+  const displayEmail = profileData?.email || "";
 
   // Listen for global follow updates to keep profile in sync
   useEffect(() => {
