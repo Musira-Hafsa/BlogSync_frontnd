@@ -439,7 +439,6 @@ useEffect(() => {
       setLoading(true);
       let targetHandle = handle;
       
-      // Fallback if handle route parameter is missing
       if (!targetHandle || targetHandle === "undefined") {
         const savedUser = localStorage.getItem("bs_user");
         if (savedUser) {
@@ -449,21 +448,22 @@ useEffect(() => {
       }
 
       if (targetHandle) {
-        // 1. Fetch user profile data (This is what you currently have)
+        // 1. Fetch user profile data (returns the user object with its unique database _id)
         const { data } = await API.get(`/users/${targetHandle}`);
         setProfile(data);
         setProfileData(data);
         
-        // 2. CRITICAL FIX: Explicitly fetch the user's blogs from your blogs endpoint
-        // NOTE: If your backend endpoint route is different (e.g., '/blogs/user/' or '/blogs/author/'), 
-        // update the string below to match your actual backend backend router path.
-        try {
-          const blogsResponse = await API.get(`/blogs/user/${targetHandle}`);
-          if (blogsResponse.data) {
-            setPosts(blogsResponse.data);
+        // 2. SUCCESSFUL BRIDGE: Use the user's database _id to query your base blogs route
+        if (data && data._id) {
+          try {
+            // This hits: GET /api/blogs?author=6a0e285bb252...
+            const blogsResponse = await API.get(`/blogs?author=${data._id}`);
+            if (blogsResponse.data) {
+              setPosts(blogsResponse.data);
+            }
+          } catch (blogErr) {
+            console.error("Failed to fetch user blogs dynamically:", blogErr);
           }
-        } catch (blogErr) {
-          console.error("Failed to fetch user blogs dynamically:", blogErr);
         }
       }
     } catch (err) {
