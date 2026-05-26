@@ -185,10 +185,19 @@ function Navbar({ user, onLogout, onTopics, onFeed, active }) {
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Write
               </button>
-              <Link to={`/profile/${user.handle}`} className="nav-user">
-                <div className="nav-av" style={{ background: avatarColor(user.handle) }}>{initials(user)}</div>
-                <span className="nav-uname">{user.firstName}</span>
-              </Link>
+             // 🚀 REPLACE WITH THIS SAFE VERSION:
+<Link 
+  to={`/profile/${user?.handle || JSON.parse(localStorage.getItem("bs_user"))?._id}`} 
+  className="nav-user"
+>
+  <div 
+    className="nav-av" 
+    style={{ background: avatarColor(user?.handle || "User") }}
+  >
+    {user ? initials(user) : "U"}
+  </div>
+  <span className="nav-uname">{user?.firstName || "User"}</span>
+</Link>
               <button className="nav-out" onClick={onLogout}>Out</button>
             </>
           ) : (
@@ -539,15 +548,17 @@ export default function Home() {
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const tokenData = JSON.parse(window.atob(base64));
 
-    // 🚀 STEP 1: Add this log line to inspect the real token data keys!
-    console.log("--- MY ACTUAL BACKEND TOKEN DATA KEYS ---", tokenData);
+    // Get the core identifier out of your verified token payload printout
+    const userId = tokenData._id || tokenData.id;
 
     const mappedSocialUser = {
-      // Look at the console log output from step 1 to see if your backend uses .username, .handle, etc.
-      handle: tokenData.handle || tokenData.username || tokenData.name || tokenData.email?.split('@')[0] || "unknown",
-      firstName: tokenData.firstName || tokenData.name?.split(' ')[0] || "User",
-      _id: tokenData._id || tokenData.id,
-      email: tokenData.email
+      // 🚀 FIX: Use the unique database ID as the handle since text handles aren't in your token
+      handle: userId, 
+      
+      // Give a clean placeholder for the name so your navbar initials logic doesn't crash
+      firstName: "User",
+      
+      _id: userId
     };
     
     setUser(mappedSocialUser);
