@@ -438,26 +438,27 @@ useEffect(() => {
       try {
         setLoading(true);
         
-        // 1. Try to fetch from the backend database row
-        // 💡 TIP: If your backend is singular, change '/users/' to '/user/' here
+        // Try hitting your backend
         const { data } = await API.get(`/users/${handle}`);
         setProfileData(data);
       } catch (err) {
-        console.warn("Backend profile endpoint failed, falling back to session data.", err);
+        console.warn("Backend 404 caught safely. Using local storage fallback.", err);
         
-        // 2. 🚀 RESILIENT FALLBACK: If backend returns a 404, use the local session cache!
+        // Fallback safely if backend profile route doesn't exist
         const savedUser = localStorage.getItem("bs_user");
         if (savedUser) {
           const parsed = JSON.parse(savedUser);
-          // If the profile ID matches who is logged in, use their data
-          if (parsed.handle === handle || parsed._id === handle) {
-            setProfileData({
-              name: parsed.firstName || "Google User",
-              username: "User",
-              email: parsed.email || "",
-              avatar: parsed.avatar || ""
-            });
-          }
+          
+          setProfileData({
+            name: parsed.firstName || "Google User",
+            username: "User",
+            email: parsed.email || "",
+            avatar: parsed.avatar || "",
+            bio: "Welcome to my blog profile!", // Added default values so your layout fields don't read undefined
+            followers: 0,
+            following: 0,
+            views: 0
+          });
         }
       } finally {
         setLoading(false);
@@ -469,10 +470,11 @@ useEffect(() => {
     } else {
       setLoading(false);
     }
-  }, [handle]);
-  
+  }, [handle]); // Runs cleanly whenever the route handle changes
+
   if (loading) return <div className="text-white text-center mt-20">Loading profile...</div>;
-  // 3. Render your data securely using your existing layout hooks
+
+  // Safe variables for your HTML render down below
   const displayName = profileData?.name || "BlogSync User";
   const displayEmail = profileData?.email || "";
 
