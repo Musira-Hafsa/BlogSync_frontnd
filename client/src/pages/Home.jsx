@@ -533,32 +533,29 @@ export default function Home() {
     
     const token = localStorage.getItem("bs_token") || sessionStorage.getItem("bs_token");
     
-    if (token && !user) {
-      try {
-        // 1. Pure JS Decode the JWT payload
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const tokenData = JSON.parse(window.atob(base64));
+   if (token && !user) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const tokenData = JSON.parse(window.atob(base64));
 
-        // 2. 🚀 MAP THE DATA FIELDS TO MATCH YOUR NAVBAR VARIABLES PERFECTLY
-        const mappedSocialUser = {
-          // Fallback to username/email prefix if handle isn't present in OAuth token payload
-          handle: tokenData.handle || tokenData.username || tokenData.email?.split('@')[0] || "user",
-          
-          // Map their full name or display name to firstName so your navbar can render it
-          firstName: tokenData.firstName || tokenData.name?.split(' ')[0] || tokenData.displayName?.split(' ')[0] || "GoogleUser",
-          
-          // Include your standard fields just in case
-          _id: tokenData._id || tokenData.id,
-          email: tokenData.email
-        };
-        
-        setUser(mappedSocialUser);
-        localStorage.setItem("bs_user", JSON.stringify(mappedSocialUser));
-      } catch (err) {
-        console.error("Error parsing JWT token details:", err);
-      }
-    }
+    // 🚀 STEP 1: Add this log line to inspect the real token data keys!
+    console.log("--- MY ACTUAL BACKEND TOKEN DATA KEYS ---", tokenData);
+
+    const mappedSocialUser = {
+      // Look at the console log output from step 1 to see if your backend uses .username, .handle, etc.
+      handle: tokenData.handle || tokenData.username || tokenData.name || tokenData.email?.split('@')[0] || "unknown",
+      firstName: tokenData.firstName || tokenData.name?.split(' ')[0] || "User",
+      _id: tokenData._id || tokenData.id,
+      email: tokenData.email
+    };
+    
+    setUser(mappedSocialUser);
+    localStorage.setItem("bs_user", JSON.stringify(mappedSocialUser));
+  } catch (err) {
+    console.error("Error parsing JWT token details:", err);
+  }
+}
 
     try {
       const { data } = await API.get("/blogs");
