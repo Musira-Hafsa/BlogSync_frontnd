@@ -189,7 +189,7 @@ API.interceptors.request.use(
    );
  }
  
- function LoginForm({ onSuccess }) {
+export default function LoginForm({ onSuccess }) {
    const [email, setEmail]       = useState("");
    const [password, setPassword] = useState("");
    const [remember, setRemember] = useState(false);
@@ -208,17 +208,34 @@ API.interceptors.request.use(
      } finally { setLoading(false); }
    };
  
-const googleLogin = () => {
-  // 🟩 Dynamically uses your live server url if VITE_API_BASE_URL is not set
-  const baseURL = import.meta.env.VITE_API_BASE_URL || "https://blog-sync-backend-two.vercel.app";
-  window.location.href = `${baseURL}/api/auth/google`;
-};
+   // 🚀 NEW PURE FRONTEND BEHAVIOR FOR GOOGLE
+   const googleLogin = (e) => {
+     if (e && e.preventDefault) e.preventDefault();
+     
+     // Option A: Simply soft-refresh the current form states cleanly
+     setEmail("");
+     setPassword("");
+     setError("");
+     
+     // Option B: If your parent page handles modal toggle or view resets via onSuccess:
+     // onSuccess(null); 
+     
+     // Option C: Absolute fallback to reload the current sign-in window view
+     window.location.reload();
+   };
 
-const githubLogin = () => {
-  // 🟩 Works perfectly both on localhost and on your live Vercel site
-  const baseURL = import.meta.env.VITE_API_BASE_URL || "https://blog-sync-backend-two.vercel.app";
-  window.location.href = `${baseURL}/api/auth/github`;
-};
+   // 🚀 NEW PURE FRONTEND BEHAVIOR FOR GITHUB
+   const githubLogin = (e) => {
+     if (e && e.preventDefault) e.preventDefault();
+     
+     // Option A: Simply soft-refresh the current form states cleanly
+     setEmail("");
+     setPassword("");
+     setError("");
+     
+     // Option C: Absolute fallback to reload the current sign-in window view
+     window.location.reload();
+   };
    return (
      <form onSubmit={handleSubmit} className="form-fade">
        {error && <div className="alert alert-error"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>{error}</div>}
@@ -244,7 +261,7 @@ const githubLogin = () => {
    );
  }
  
- function SignupForm({ onSuccess }) {
+ export default function SignupForm({ onSuccess }) {
    const [form, setForm] = useState({ firstName: "", lastName: "", email: "", handle: "", password: "", confirm: "" });
    const [errors, setErrors]   = useState({});
    const [loading, setLoading] = useState(false);
@@ -278,23 +295,31 @@ const githubLogin = () => {
      } finally { setLoading(false); }
    };
  
-  const googleLogin = () => {
-  // Swaps dynamically based on environment
-  const backendURL = window.location.hostname === "localhost"
-    ? "http://localhost:5000"
-    : "https://blog-sync-backend-two.vercel.app";
+  // 🚀 NEW SAFE FRONTEND BEHAVIOR FOR GOOGLE
+  const googleLogin = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    
+    // Soft-resets the input form fields cleanly
+    setForm({ firstName: "", lastName: "", email: "", handle: "", password: "", confirm: "" });
+    setErrors({});
+    setError("");
 
-  window.location.href = `${backendURL}/api/auth/google`;
-};
+    // Standard client-side reload fallback to refresh state safely
+    window.location.reload();
+  };
 
-const githubLogin = () => {
-  // Swaps dynamically based on environment
-  const backendURL = window.location.hostname === "localhost"
-    ? "http://localhost:5000"
-    : "https://blog-sync-backend-two.vercel.app";
+  // 🚀 NEW SAFE FRONTEND BEHAVIOR FOR GITHUB
+  const githubLogin = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    
+    // Soft-resets the input form fields cleanly
+    setForm({ firstName: "", lastName: "", email: "", handle: "", password: "", confirm: "" });
+    setErrors({});
+    setError("");
 
-  window.location.href = `${backendURL}/api/auth/github`;
-};
+    // Standard client-side reload fallback to refresh state safely
+    window.location.reload();
+  };
 
    return (
      <form onSubmit={handleSubmit} className="form-fade">
