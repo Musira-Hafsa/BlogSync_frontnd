@@ -437,29 +437,11 @@ useEffect(() => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
-        
-        // Try hitting your backend
+        // Your original backend endpoint configuration
         const { data } = await API.get(`/users/${handle}`);
         setProfileData(data);
       } catch (err) {
-        console.warn("Backend 404 caught safely. Using local storage fallback.", err);
-        
-        // Fallback safely if backend profile route doesn't exist
-        const savedUser = localStorage.getItem("bs_user");
-        if (savedUser) {
-          const parsed = JSON.parse(savedUser);
-          
-          setProfileData({
-            name: parsed.firstName || "Google User",
-            username: "User",
-            email: parsed.email || "",
-            avatar: parsed.avatar || "",
-            bio: "Welcome to my blog profile!", // Added default values so your layout fields don't read undefined
-            followers: 0,
-            following: 0,
-            views: 0
-          });
-        }
+        console.error("Profile fetch failed:", err);
       } finally {
         setLoading(false);
       }
@@ -470,13 +452,10 @@ useEffect(() => {
     } else {
       setLoading(false);
     }
-  }, [handle]); // Runs cleanly whenever the route handle changes
+  }, [handle]);
 
+  // If loading, show your clean loading state layout
   if (loading) return <div className="text-white text-center mt-20">Loading profile...</div>;
-
-  // Safe variables for your HTML render down below
-  const displayName = profileData?.name || "BlogSync User";
-  const displayEmail = profileData?.email || "";
 
   // Listen for global follow updates to keep profile in sync
   useEffect(() => {
