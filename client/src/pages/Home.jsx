@@ -530,15 +530,32 @@ export default function Home() {
  useEffect(() => {
   (async () => {
     setLoading(true);
+     const token = localStorage.getItem("bs_token") || sessionStorage.getItem("bs_token");
     
-    // 1. Grab your authenticated token
-    const token = localStorage.getItem("bs_token") || sessionStorage.getItem("bs_token");
     if (token && !user) {
-      const fallbackUser = { isAuthenticated: true, loggedInViaSocial: true };
-      
-      setUser(fallbackUser);
-      localStorage.setItem("bs_user", JSON.stringify(fallbackUser));
+      try {
+        // 🚀 PURE JS DECODE: Grab the payload middle section of the JWT token string
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const tokenData = JSON.parse(window.atob(base64));
+
+        // Create a user object using the REAL data hidden inside your token
+        // (Verify if your backend payload uses ._id or .id, and .name or .username)
+        const realUser = {
+          _id: tokenData._id || tokenData.id,
+          name: tokenData.name || tokenData.username,
+          email: tokenData.email,
+          avatar: tokenData.avatar || tokenData.profilePic,
+          isAuthenticated: true
+        };
+        
+        setUser(realUser);
+        localStorage.setItem("bs_user", JSON.stringify(realUser));
+      } catch (err) {
+        console.error("Error parsing JWT token details:", err);
+      }
     }
+
     try {
       const { data } = await API.get("/blogs");
       setPosts(data.length ? data : MOCK);
