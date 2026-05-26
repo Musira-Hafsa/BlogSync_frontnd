@@ -4,7 +4,7 @@ import axios from "axios";
 import { follow as followUser, unfollow as unfollowUser, onFollowUpdate } from "../utils/followService";
 import { uploadImage, cloudinaryUrl } from "../api/uploadImage";
 import ThemeToggle from "../components/ThemeToggle";
-const { handle } = useParams();
+
 
 const API = axios.create({ 
   baseURL: import.meta.env.VITE_API_BASE_URL 
