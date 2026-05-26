@@ -189,7 +189,7 @@ API.interceptors.request.use(
    );
  }
  
-export default function LoginForm({ onSuccess }) {
+function LoginForm({ onSuccess }) {
    const [email, setEmail]       = useState("");
    const [password, setPassword] = useState("");
    const [remember, setRemember] = useState(false);
@@ -261,7 +261,7 @@ export default function LoginForm({ onSuccess }) {
    );
  }
  
- export default function SignupForm({ onSuccess }) {
+function SignupForm({ onSuccess }) {
    const [form, setForm] = useState({ firstName: "", lastName: "", email: "", handle: "", password: "", confirm: "" });
    const [errors, setErrors]   = useState({});
    const [loading, setLoading] = useState(false);
