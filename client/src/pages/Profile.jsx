@@ -434,28 +434,39 @@ export default function Profile() {
   const isOwner = currentUser && currentUser.handle === handle;
 
 useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        // Fallback: If route parameter is missing or says "undefined", extract the saved handle text
-        let targetHandle = handle;
-        if (!targetHandle || targetHandle === "undefined") {
-          const savedUser = localStorage.getItem("bs_user");
-          if (savedUser) {
-            const parsed = JSON.parse(savedUser);
-            targetHandle = parsed.handle; // Target the text handle field
-          }
+  const fetchProfile = async () => {
+    try {
+      setLoading(true); // Ensure loading is true when a fetch starts
+      
+      // Fallback: If route parameter is missing or says "undefined", extract the saved handle text
+      let targetHandle = handle;
+      if (!targetHandle || targetHandle === "undefined") {
+        const savedUser = localStorage.getItem("bs_user");
+        if (savedUser) {
+          const parsed = JSON.parse(savedUser);
+          targetHandle = parsed.handle; // Target the text handle field
         }
-
-        // 2. THIS IS WHERE YOU REPLACE THE API CALL STRING:
-        const { data } = await API.get(`/users/${targetHandle}`);
-        setProfileData(data);
-      } catch (err) {
-        console.error("Profile fetch failed:", err);
       }
-    };
 
-    fetchProfile();
-  }, [handle]);
+      // Make sure we actually have a handle before calling the API
+      if (targetHandle) {
+        const { data } = await API.get(`/users/${targetHandle}`);
+        
+        // Update BOTH states if you use them interchangeably, 
+        // or just setProfile if that's what your JSX relies on!
+        setProfile(data); 
+        setProfileData(data);
+      }
+    } catch (err) {
+      console.error("Profile fetch failed:", err);
+    } finally {
+      // CRITICAL: This turns off the skeleton loaders
+      setLoading(false); 
+    }
+  };
+
+  fetchProfile();
+}, [handle]);
 
   // Listen for global follow updates to keep profile in sync
   useEffect(() => {
