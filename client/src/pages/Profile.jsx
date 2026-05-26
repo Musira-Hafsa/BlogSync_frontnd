@@ -436,32 +436,31 @@ export default function Profile() {
 useEffect(() => {
   const fetchProfile = async () => {
     try {
-      setLoading(true); // Ensure loading is true when a fetch starts
-      
-      // Fallback: If route parameter is missing or says "undefined", extract the saved handle text
+      setLoading(true);
       let targetHandle = handle;
       if (!targetHandle || targetHandle === "undefined") {
         const savedUser = localStorage.getItem("bs_user");
         if (savedUser) {
           const parsed = JSON.parse(savedUser);
-          targetHandle = parsed.handle; // Target the text handle field
+          targetHandle = parsed.handle;
         }
       }
 
-      // Make sure we actually have a handle before calling the API
       if (targetHandle) {
         const { data } = await API.get(`/users/${targetHandle}`);
-        
-        // Update BOTH states if you use them interchangeably, 
-        // or just setProfile if that's what your JSX relies on!
-        setProfile(data); 
+        setProfile(data);
         setProfileData(data);
+        
+        // CRITICAL: Feed the user's posts into your state array 
+        // so totalViews, totalLikes, and pubPosts can calculate dynamically
+        if (data.posts) {
+          setPosts(data.posts);
+        }
       }
     } catch (err) {
       console.error("Profile fetch failed:", err);
     } finally {
-      // CRITICAL: This turns off the skeleton loaders
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -482,21 +481,24 @@ useEffect(() => {
 
   // Fetch drafts separately — only when the owner switches to the Drafts tab
   // (protected endpoint: GET /api/blogs/drafts)
-  useEffect(() => {
-    if (tab !== "drafts" || !isOwner) return;
-    (async () => {
-      setDraftsLoading(true);
-      try {
-        const { data } = await API.get("/blogs/drafts");
-        setDrafts(data);
-      } catch {
-        // fallback: filter mock data
-        setDrafts(MOCK_POSTS.filter(p => !p.published));
-      } finally {
-        setDraftsLoading(false);
-      }
-    })();
-  }, [tab, isOwner]);
+ useEffect(() => {
+  if (!isOwner) return;
+  
+  const fetchDrafts = async () => {
+    setDraftsLoading(true);
+    try {
+      const { data } = await API.get("/blogs/drafts");
+      setDrafts(data);
+    } catch (err) {
+      console.error("Drafts fetch failed:", err);
+      setDrafts(MOCK_POSTS.filter(p => !p.published));
+    } finally {
+      setDraftsLoading(false);
+    }
+  };
+
+  fetchDrafts();
+}, [isOwner, handle]);
 
   // Cloudinary avatar upload
   const handleAvatarFile = async (e) => {
