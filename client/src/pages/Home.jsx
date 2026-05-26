@@ -530,27 +530,31 @@ export default function Home() {
  useEffect(() => {
   (async () => {
     setLoading(true);
-     const token = localStorage.getItem("bs_token") || sessionStorage.getItem("bs_token");
+    
+    const token = localStorage.getItem("bs_token") || sessionStorage.getItem("bs_token");
     
     if (token && !user) {
       try {
-        // 🚀 PURE JS DECODE: Grab the payload middle section of the JWT token string
+        // 1. Pure JS Decode the JWT payload
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
         const tokenData = JSON.parse(window.atob(base64));
 
-        // Create a user object using the REAL data hidden inside your token
-        // (Verify if your backend payload uses ._id or .id, and .name or .username)
-        const realUser = {
+        // 2. 🚀 MAP THE DATA FIELDS TO MATCH YOUR NAVBAR VARIABLES PERFECTLY
+        const mappedSocialUser = {
+          // Fallback to username/email prefix if handle isn't present in OAuth token payload
+          handle: tokenData.handle || tokenData.username || tokenData.email?.split('@')[0] || "user",
+          
+          // Map their full name or display name to firstName so your navbar can render it
+          firstName: tokenData.firstName || tokenData.name?.split(' ')[0] || tokenData.displayName?.split(' ')[0] || "GoogleUser",
+          
+          // Include your standard fields just in case
           _id: tokenData._id || tokenData.id,
-          name: tokenData.name || tokenData.username,
-          email: tokenData.email,
-          avatar: tokenData.avatar || tokenData.profilePic,
-          isAuthenticated: true
+          email: tokenData.email
         };
         
-        setUser(realUser);
-        localStorage.setItem("bs_user", JSON.stringify(realUser));
+        setUser(mappedSocialUser);
+        localStorage.setItem("bs_user", JSON.stringify(mappedSocialUser));
       } catch (err) {
         console.error("Error parsing JWT token details:", err);
       }

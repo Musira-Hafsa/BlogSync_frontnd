@@ -4,6 +4,7 @@ import axios from "axios";
 import { follow as followUser, unfollow as unfollowUser, onFollowUpdate } from "../utils/followService";
 import { uploadImage, cloudinaryUrl } from "../api/uploadImage";
 import ThemeToggle from "../components/ThemeToggle";
+const { handle } = useParams();
 
 const API = axios.create({ 
   baseURL: import.meta.env.VITE_API_BASE_URL 
@@ -424,6 +425,8 @@ export default function Profile() {
   const [following,       setFollowing]        = useState(false);
   const [editing,         setEditing]          = useState(false);
   const [avatarUploading, setAvatarUploading]  = useState(false);
+const { handle } = useParams(); 
+  const [profileData, setProfileData] = useState(null);
 
   // Fix 4: state for the themed delete dialog
   const [deleteTarget,    setDeleteTarget]     = useState(null); // post object | null
@@ -431,22 +434,28 @@ export default function Profile() {
   const avatarFileRef = useRef();
   const isOwner = currentUser && currentUser.handle === handle;
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
+useEffect(() => {
+    const fetchProfile = async () => {
       try {
-        const { data }     = await API.get(`/users/${handle}`);
-        // Published posts — public endpoint
-        const { data: pd } = await API.get(`/blogs?author=${data._id}`);
-        setProfile(data);
-        setFollowing(Boolean(data.isFollowing));
-        setPosts(pd);
-      } catch {
-        setProfile(MOCK_PROFILE);
-        setPosts(MOCK_POSTS.filter(p => p.published));
+        // Fallback: If route parameter is missing or says "undefined", extract the saved handle text
+        let targetHandle = handle;
+        if (!targetHandle || targetHandle === "undefined") {
+          const savedUser = localStorage.getItem("bs_user");
+          if (savedUser) {
+            const parsed = JSON.parse(savedUser);
+            targetHandle = parsed.handle; // Target the text handle field
+          }
+        }
+
+        // 2. THIS IS WHERE YOU REPLACE THE API CALL STRING:
+        const { data } = await API.get(`/users/${targetHandle}`);
+        setProfileData(data);
+      } catch (err) {
+        console.error("Profile fetch failed:", err);
       }
-      setLoading(false);
-    })();
+    };
+
+    fetchProfile();
   }, [handle]);
 
   // Listen for global follow updates to keep profile in sync
