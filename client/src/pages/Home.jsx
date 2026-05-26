@@ -390,13 +390,13 @@ export function Writers() {
     })();
   }, []);
 
-  const handleLogout = () => {
-    ["bs_token", "bs_user"].forEach((k) => {
-      localStorage.removeItem(k);
-      sessionStorage.removeItem(k);
-    });
-    navigate("/auth");
-  };
+  // const handleLogout = () => {
+  //   ["bs_token", "bs_user"].forEach((k) => {
+  //     localStorage.removeItem(k);
+  //     sessionStorage.removeItem(k);
+  //   });
+  //   navigate("/auth");
+  // };
 
   const handleFollowAction = async (author, currentlyFollowing) => {
     if (!storedUser) {
