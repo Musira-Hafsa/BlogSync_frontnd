@@ -185,19 +185,9 @@ function Navbar({ user, onLogout, onTopics, onFeed, active }) {
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Write
               </button>
-             // 🚀 REPLACE WITH THIS SAFE VERSION:
-<Link 
-  to={`/profile/${user?.handle || JSON.parse(localStorage.getItem("bs_user"))?._id}`} 
-  className="nav-user"
->
-  <div 
-    className="nav-av" 
-    style={{ background: avatarColor(user?.handle || "User") }}
-  >
-    {user ? initials(user) : "U"}
-  </div>
-  <span className="nav-uname">{user?.firstName || "User"}</span>
-</Link>
+             //REPLACE WITH THIS SAFE VERSION:
+<Link to={`/profile/${user.handle}`} className="nav-user"><div className="nav-av" style={{ background: avatarColor(user.handle) }}>{initials(user)}</div>
+<span className="nav-uname">{user.firstName}</span></Link> 
               <button className="nav-out" onClick={onLogout}>Out</button>
             </>
           ) : (
