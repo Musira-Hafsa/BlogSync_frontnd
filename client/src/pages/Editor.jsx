@@ -261,6 +261,21 @@ const handleFile = async (e) => {
   };
   const displayCover = coverLocal || coverUrl;
 
+const handleUrlSubmit = () => {
+  if (!urlInput.trim()) {
+    setUrlError("Please enter a valid image URL");
+    return;
+  }
+  
+  if (!urlInput.startsWith("http://") && !urlInput.startsWith("https://")) {
+    setUrlError("URL must start with http:// or https://");
+    return;
+  }
+
+  setUrlError("");
+  setCoverUrl(urlInput.trim()); // Successfully updates the image state!
+};
+const displayCover = coverLocal || coverUrl;
   return (
     <div style={{ marginBottom: "2.5rem" }}>
       {/* Tabs */}
@@ -302,16 +317,20 @@ const handleFile = async (e) => {
       ) : (
         <>
           <div className="url-input-wrap">
-            <input
-              className="url-input"
-              type="url"
-              placeholder="https://example.com/image.jpg"
-              value={urlInput}
-              onChange={e => { setUrlInput(e.target.value); setUrlError(""); }}
-              onKeyDown={e => e.key === "Enter" && applyUrl()}
-            />
-            <button className="url-apply-btn" onClick={applyUrl}>Apply</button>
-          </div>
+  <input
+    className="url-input"
+    type="url"
+    placeholder="https://example.com/image.jpg"
+    value={urlInput}
+    onChange={e => { setUrlInput(e.target.value); setUrlError(""); }}
+    
+    // 🔮 FIXED: applyUrl() ki jagah handleUrlSubmit() kar diya
+    onKeyDown={e => e.key === "Enter" && handleUrlSubmit()} 
+  />
+  
+  {/* 🔮 FIXED: applyUrl ki jagah handleUrlSubmit kar diya */}
+  <button className="url-apply-btn" onClick={handleUrlSubmit}>Apply</button>
+</div>
           {urlError && <p className="url-error">{urlError}</p>}
           {coverUrl && !urlError && (
             <img
