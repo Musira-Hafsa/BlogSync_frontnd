@@ -259,7 +259,7 @@ const handleFile = async (e) => {
       URL.revokeObjectURL(local);
     } finally { setUploading(false); }
   };
-  const displayCover = coverLocal || coverUrl;
+
 
 const handleUrlSubmit = () => {
   if (!urlInput.trim()) {
