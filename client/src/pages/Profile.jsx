@@ -436,26 +436,26 @@ export default function Profile() {
 useEffect(() => {
     const fetchProfile = async () => {
       try {
-        setLoading(true);
-        // Your original backend endpoint configuration
-        const { data } = await API.get(`/users/${handle}`);
+        // Fallback: If route parameter is missing or says "undefined", extract the saved handle text
+        let targetHandle = handle;
+        if (!targetHandle || targetHandle === "undefined") {
+          const savedUser = localStorage.getItem("bs_user");
+          if (savedUser) {
+            const parsed = JSON.parse(savedUser);
+            targetHandle = parsed.handle; // Target the text handle field
+          }
+        }
+
+        // 2. THIS IS WHERE YOU REPLACE THE API CALL STRING:
+        const { data } = await API.get(`/users/${targetHandle}`);
         setProfileData(data);
       } catch (err) {
         console.error("Profile fetch failed:", err);
-      } finally {
-        setLoading(false);
       }
     };
 
-    if (handle && handle !== "undefined") {
-      fetchProfile();
-    } else {
-      setLoading(false);
-    }
+    fetchProfile();
   }, [handle]);
-
-  // If loading, show your clean loading state layout
-  if (loading) return <div className="text-white text-center mt-20">Loading profile...</div>;
 
   // Listen for global follow updates to keep profile in sync
   useEffect(() => {
