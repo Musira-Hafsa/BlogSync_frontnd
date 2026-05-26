@@ -425,7 +425,6 @@ export default function Profile() {
   const [following,       setFollowing]        = useState(false);
   const [editing,         setEditing]          = useState(false);
   const [avatarUploading, setAvatarUploading]  = useState(false);
-const { handle } = useParams(); 
   const [profileData, setProfileData] = useState(null);
 
   // Fix 4: state for the themed delete dialog
