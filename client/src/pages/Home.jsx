@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import axios from "../api/axios";
 import { follow as followUser, unfollow as unfollowUser } from "../utils/followService";
 import { cloudinaryUrl } from "../api/uploadImage";
 import ThemeToggle from "../components/ThemeToggle";
