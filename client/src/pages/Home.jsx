@@ -390,13 +390,13 @@ export function Writers() {
     })();
   }, []);
 
-  // const handleLogout = () => {
-  //   ["bs_token", "bs_user"].forEach((k) => {
-  //     localStorage.removeItem(k);
-  //     sessionStorage.removeItem(k);
-  //   });
-  //   navigate("/auth");
-  // };
+  const handleLogout = () => {
+    ["bs_token", "bs_user"].forEach((k) => {
+      localStorage.removeItem(k);
+      sessionStorage.removeItem(k);
+    });
+    navigate("/auth");
+  };
 
   const handleFollowAction = async (author, currentlyFollowing) => {
     if (!storedUser) {
@@ -518,10 +518,10 @@ export default function Home() {
     feedRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-    const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("bs_user") || sessionStorage.getItem("bs_user");
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+  //   const [user, setUser] = useState(() => {
+  //   const savedUser = localStorage.getItem("bs_user") || sessionStorage.getItem("bs_user");
+  //   return savedUser ? JSON.parse(savedUser) : null;
+  // });
 
   // ==========================================
   // FETCH BLOGS LOGIC (YOURS UPDATED WITH STATE CHECK)
